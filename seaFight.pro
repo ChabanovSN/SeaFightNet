@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,8 +13,26 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+    field.cpp \
+    myfield.cpp \
+    enemyfield.cpp \
+    window.cpp \
+    serverwindow.cpp \
+    clientdialog.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += \
+    field.h \
+    myfield.h \
+    enemyfield.h \
+    window.h \
+    serverwindow.h \
+    clientdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += \
+    serverwindow.ui \
+    clientdialog.ui
+
+DISTFILES +=
+
+RESOURCES += \
+    res.qrc

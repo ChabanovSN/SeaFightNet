@@ -1,2 +1,6 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<RCC>
+    <qresource prefix="/">
+        <file>sea_bg.jpg</file>
+        <file>ship.jpg</file>
+    </qresource>
+</RCC>
