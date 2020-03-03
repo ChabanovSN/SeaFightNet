@@ -7,17 +7,17 @@ MyField::MyField(int hX, int hY)
 //   pm = new QPixmap(":/sea_bg.jpg");
 // //  pm->scaled(hX,hY,Qt::KeepAspectRatio);
 
-    x = hX;
-    y = hY;
+    width = hX;
+    hieght = hY;
     zero_x = hX / 10;
     zero_y = hY / 10;
-
+    myField = true;
 
 
     pm->fill(QColor(176,224,230));
     editingMode = true;
     drawField();
-    playerName = "Player 1";
+    playerName = " I'm player";
 
 
 }

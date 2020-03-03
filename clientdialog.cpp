@@ -1,6 +1,6 @@
 #include "clientdialog.h"
 #include "ui_clientdialog.h"
-
+#include "window.h"
 #include <QtGui>
 #include <QDebug>
 
@@ -14,14 +14,14 @@ ClientDialog::ClientDialog(QWidget *parent) :
 
     ui->setupUi(this);
     passwd = ui->textpasswd->text();
-    clientSocket  = new  QTcpSocket(this);
+   // clientSocket  = new  QTcpSocket(this);
     connect(ui->get, SIGNAL(clicked(bool)), this, SLOT(onSokReadyRead()));
-    connect(clientSocket,SIGNAL(readyRead()), this, SLOT(onSokReadyRead()));
+    connect(&clientSocket,SIGNAL(readyRead()), this, SLOT(onSokReadyRead()));
     connect(ui->btnConnect,SIGNAL(clicked(bool)),this,SLOT(onSokConnected()));
    // connect(clientSocket, SIGNAL(disconnected()), this, SLOT(onSokDisconnected()));
      connect(ui->btnDiconnect,SIGNAL(clicked(bool)),this,SLOT(onSokDisconnected()));
 
-    connect(clientSocket, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
+    connect(&clientSocket, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(onSokDisplayError(QAbstractSocket::SocketError)));
 }
 
 ClientDialog::~ClientDialog()
@@ -41,29 +41,40 @@ void ClientDialog::onSokDisplayError(QAbstractSocket::SocketError socketError)
         QMessageBox::information(this, "Error", "The connection was refused by the peer.");
         break;
     default:
-        QMessageBox::information(this, "Error", "The following error occurred: "+clientSocket->errorString());
+        QMessageBox::information(this, "Error", "The following error occurred: "+clientSocket.errorString());
     }
 }
 
 void ClientDialog::onSokReadyRead(){
 
-    QString str = QString::fromUtf8(clientSocket->readAll());
-    QStringList pieces = str.split(" ");
-    AddToLog("Client from :"+str);
-    QTextStream os(clientSocket);
+//    QString str ="";
+//        for (int i = 0; i < 10; i++){
+//            for (int j = 0; j < 10; j++)
+//               str.append(QString::number(FIELD[j][i])).append(" ");
+//           qDebug()<<str;
+//           str="";
+//        }
+
+
+    QString str = QString::fromUtf8(clientSocket.readAll());
+    QStringList pieces = str.split("/");
+     qDebug()<<pieces.size()<<"SIZE!!!!!!!!!!!!!"<<str;
+    AddToLog("Server from :"+str+"\n");
+    QTextStream os(&clientSocket);
     os.setAutoDetectUnicode(true);
-     qDebug()<<pieces[0] <<" pieces[0]"<<  passwd<<  clientSocket->isOpen();
-    if(pieces[0] != passwd){
+    // qDebug()<<pieces[0] <<" pieces[0]"<<  passwd<<  clientSocket.isOpen();
+  //  if( pieces[0] != passwd){
+        // EnemyField->fillEnemyFieldFromConnect(pieces[1]);
         str.clear();
-        str.append(passwd).append(" ,0,0,0,0,0,0,0,0,0,0 ");
-
-
-        //EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+        str.append(passwd).append("/").append(MyField->getField()).append("/");
+         if(pieces.size()>2 )
+        EnemyField->fillEnemyFieldFromConnect(pieces[1]);
         os << str
-        << QDateTime::currentDateTime().toString() << "\n";
-         AddToLog("Client to:"+str);
-         clientSocket->close();
-    }
+        <<"\n"
+        << QTime::currentTime().toString() << "\n";
+         AddToLog("Server to:"+str+"\n");
+       //  clientSocket.close();
+   // }
 }
 
 
@@ -71,11 +82,11 @@ void ClientDialog::onSokReadyRead(){
 void ClientDialog::onSokConnected()
 {
    // on_pbConnect_clicked();
-     clientSocket->connectToHost(ui->textHost->text(), ui->spinPort->value());
+     clientSocket.connectToHost(QHostAddress(ui->textHost->text()), ui->spinPort->value());
 
-     QString str = QString::fromUtf8(clientSocket->readAll());
-     //QStringList pieces = str.split(" ");
-     AddToLog("Client from :"+str);
+//     QString str = QString::fromUtf8(clientSocket->readAll());
+//     //QStringList pieces = str.split(" ");
+//     AddToLog("Client from :"+str);
 
 
 //     QString str = QString::fromUtf8(clientSocket->readAll());
@@ -93,8 +104,8 @@ void ClientDialog::onSokConnected()
 
 //     AddToLog("Connected to"+clientSocket->peerAddress().toString()+":"+QString::number(clientSocket->peerPort()),Qt::green);
 //   }else
-     if(clientSocket->isOpen())
-         AddToLog("Connected to"+clientSocket->peerAddress().toString()+":"+QString::number(clientSocket->peerPort()),Qt::green);
+     if(clientSocket.isOpen())
+         AddToLog("Connected to"+clientSocket.peerAddress().toString()+":"+QString::number(clientSocket.peerPort()),Qt::green);
         else
          AddToLog("Error to connect",Qt::green);
 
@@ -102,10 +113,10 @@ void ClientDialog::onSokConnected()
 
 void ClientDialog::onSokDisconnected()
 {
-    clientSocket->disconnectFromHost();
+    clientSocket.disconnectFromHost();
     ui->btnConnect->setEnabled(true);
     ui->btnDiconnect->setEnabled(false);
-    AddToLog("Disconnected from"+clientSocket->peerAddress().toString()+":"+QString::number(clientSocket->peerPort()), Qt::green);
+    AddToLog("Disconnected from"+clientSocket.peerAddress().toString()+":"+QString::number(clientSocket.peerPort()), Qt::green);
 }
 
 //void ClientDialog::on_pbConnect_clicked()

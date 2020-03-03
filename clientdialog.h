@@ -36,7 +36,7 @@ private slots:
 
 private:
     Ui::ClientDialog *ui;
-    QTcpSocket * clientSocket;
+    QTcpSocket  clientSocket;
     QString passwd;
     void AddToLog(QString text, QColor color = Qt::black);
 

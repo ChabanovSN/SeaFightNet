@@ -30,14 +30,16 @@ public:
     // Не спрашивайте, почему я вместо лейблов поставил кнопки
     QPushButton *lblMyCount;     // эти надписи будут показывать
     QPushButton *lblEnemyCount;  // сколько клеток расставлено по полям
-    QPushButton *debMy;
-    QPushButton *debEn;
+    QLabel *debMy;
+    QLabel *debEn;
     QPushButton *server;
     QPushButton *client;
     ServerWindow *serverWindow;
     ClientDialog *clientWindow;
     QPushButton *cleanField;
+    QPushButton *fire;
     QPushButton *playWithComp;
+    QPushButton *randomPos;
 
 signals:
     void sendName(const QString &name); // сигнал для отправки имени игрока
@@ -47,6 +49,7 @@ signals:
 //    void btStartClient();
 //public slots:
 private slots:
+    void fireToEnemy();
     void getMouseCoord(int x, int y);
     void setMyCountOfCells(int myCountCells);
     void setEnemyCountOfCells(int enemyCountCells);

@@ -70,26 +70,27 @@ void ServerWindow::slotReadClient()
     QTcpSocket* clientSocket = (QTcpSocket*)sender();
     int idusersocs=clientSocket->socketDescriptor();
     QString str = QString::fromUtf8(clientSocket->readAll());
-    QStringList pieces = str.split(" ");
-     ui->textinfo->append("Client from:"+str);
+    QStringList pieces = str.split("/");
+     ui->textinfo->append("Client from:"+str+"\n");
      QTextStream os(clientSocket);
       os.setAutoDetectUnicode(true);
 
-   if(pieces[0]== passwd){ // можно грохнуть через телнет (passwd лялялялл)
+   if( pieces[0]== passwd){ // можно грохнуть через телнет (passwd лялялялл)
        str.clear();
-       str.append(passwd).append(" ").append(MyField->getField());
-       qDebug()<<pieces[0] <<" pieces[0]"<<  passwd ;
+       str.append(passwd).append("/").append(MyField->getField()).append("/");
+    //   qDebug()<<pieces[0] <<" pieces[0]"<<  passwd ;
+       if(pieces.size()>2 )
        EnemyField->fillEnemyFieldFromConnect(pieces[1]);
 
        os << str
-       << QDateTime::currentDateTime().toString() << "\n";
-
-      ui->textinfo->append("Client to:"+str);
+          <<"\n"
+          << QTime::currentTime().toString() << "\n";
+      ui->textinfo->append("Client to:"+str+"\n");
    }else{
         os << "You not our friend!!! :"
            << QDateTime::currentDateTime().toString() << "\n";
 
-       ui->textinfo->append("Someone stranger.... :"+str);
+       ui->textinfo->append("Someone stranger.... :"+str+"\n");
        clientSocket->close();
        SClients.remove(idusersocs);
    }
