@@ -6,6 +6,7 @@ MyField::MyField(int hX, int hY)
 
 //   pm = new QPixmap(":/sea_bg.jpg");
 // //  pm->scaled(hX,hY,Qt::KeepAspectRatio);
+ painter = new QPainter(pm);
 
     width = hX;
     hieght = hY;
@@ -32,7 +33,10 @@ void MyField::endEditing(){
     editingMode =  !editingMode;
 }
 
-//void MyField::startEditing()
-//{
-//    QMessageBox::information(this, "Расстановка", QString("Сначала %1 расставляет свои корабли").arg(playerName));
-//}
+void MyField::startEditing()
+{
+//    QMessageBox::information(this, "Position ships", QString("Now %1 position ships").arg(playerName));
+    editingMode = true;
+//    pm->fill();
+//    drawField();
+}

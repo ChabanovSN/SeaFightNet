@@ -151,3 +151,4 @@ void ServerWindow::setMyFild(Field *f){
 void ServerWindow::setEnemyFild(Field *field){
     this->EnemyField = field;
 }
+

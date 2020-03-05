@@ -5,6 +5,8 @@ EnemyField::EnemyField(int hX, int hY)
     pm = new QPixmap(hX, hY);
     pm->fill(Qt::gray);
    // drawNonActiveField();
+     painter = new QPainter(pm);
+
     width = hX;
     hieght = hY;
     zero_x = hX / 10;
@@ -16,10 +18,7 @@ EnemyField::EnemyField(int hX, int hY)
 
     count = 0;  // первоначально на поле 0 расставленых клеток
 
-    // очищаем массив клеток на всякий случай
-    for (int i = 0; i < 10; i++)
-        for (int j = 0; j < 10; j++)
-            FIELD[i][j] = 0;
+
 
 }
 

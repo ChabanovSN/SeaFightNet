@@ -42,7 +42,7 @@ public:
     QPushButton *playWithComp;
     QPushButton *randomPos;
 
-signals:
+signals:  
     void sendName(const QString &name); // сигнал для отправки имени игрока
     void startEditing();    // разрешить редактирование
     void startGame();   // начать игру
@@ -52,13 +52,13 @@ signals:
 private slots:
     void fireToEnemy();
     void getMouseCoord(int x, int y);
-    void setMyCountOfCells(int myCountCells);
-    void setEnemyCountOfCells(int enemyCountCells);
+    void setMyCountOfCells(int myCountCells,int myCountCellsDead);
+    void setEnemyCountOfCells(int enemyCountCells,int enemyCountCellsDead);
     void startServer();
     void startClient();
     void startPlayWithComp();
     Field *  getFieldClass();
-private:
+     void fireBtnOffOnSet();
     void freeButtons();
 };
 

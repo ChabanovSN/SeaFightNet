@@ -17,48 +17,55 @@ Field::Field(QWidget *parent) : QWidget(parent)
 void Field::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    QPainter p(this);
 
-    p.drawPixmap(zero_x, zero_y, width, hieght, *pm);
+  painterThis = new QPainter(this);
+
+    painterThis->drawPixmap(zero_x, zero_y, width, hieght, *pm);
+
+   // update();
+    delete painterThis;
 
 }
 
 void Field::drawField()
 {
-    QPainter pntr(pm);
+    //QPainter   *painter = painter;
+    // painter = new QPainter(pm);
     // нарисуем рамку
-    //    pntr.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-    //    pntr.drawRect(QRect(QPoint(zero_x, zero_y), QPoint(x-2, y-2)));
+    //    painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+    //    painter.drawRect(QRect(QPoint(zero_x, zero_y), QPoint(x-2, y-2)));
 
     // Теперь нарисуем собственно деления/cells
-    pntr.setPen(QPen(Qt::blue, 1, Qt::SolidLine));
+    painter->setPen(QPen(Qt::blue, 1, Qt::SolidLine));
     cell = width / 11; /// width / 10  zero_y 0 , y = hieght
     //QMessageBox::information(this, "debug", QString::number(cell));
     for (int i = 1; i < 12; i++)
     {
-        pntr.drawLine(QPoint(i*cell, zero_y), QPoint(i*cell, hieght)); // vertical
-        pntr.drawLine(QPoint(zero_x, i*cell), QPoint(width, i*cell)); // horizontal
+        painter->drawLine(QPoint(i*cell, zero_y), QPoint(i*cell, hieght)); // vertical
+        painter->drawLine(QPoint(zero_x, i*cell), QPoint(width, i*cell)); // horizontal
     }
-    // pntr.setFont(QFont("Times New Roman", 12, 20));
+    // painter.setFont(QFont("Times New Roman", 12, 20));
     QChar temp[10] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
     for (int i = 0; i < 10; i++)
     {   //QMessageBox::information(this, "debug", QString(temp[i]));
-        pntr.drawText(QRect(cell+i*cell+cell/2-2, 4, cell*2 + i*cell, cell-4), QString(temp[i]));
+        painter->drawText(QRect(cell+i*cell+cell/2-2, 4, cell*2 + i*cell, cell-4), QString(temp[i]));
     }
     for (int i = 1; i < 11; i++)
     {
-        pntr.drawText(QRect(4, cell*i+cell/2-7, cell-4, cell), QString::number(i));
+        painter->drawText(QRect(4, cell*i+cell/2-7, cell-4, cell), QString::number(i));
     }
-    update();
-    //drawLabels();
 
+    //drawLabels();
+  // while(!painter->end());
+     update();
+   // delete painter;
 
 }
 
 void Field::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
-    {      qDebug()<<" aim  editingMode "<<editingMode << " player "<<playerName;
+    {
         if (editingMode == true){
 
             drawCell(event->x(), event->y(), CL_CELL);
@@ -81,7 +88,7 @@ void Field::drawCell(int xP, int yP, CELLS cellType)
     // индексы для массива клеток
     // qDebug()<<" cellX -Y "<<xP<<" "<<yP<< " cellType "<<cellType;
     int c_x, c_y;
-    QPainter pntr(pm);
+  //  QPainter *painter = new QPainter(pm);
 
     if ((xP >=zero_x+cell && xP <= width+cell) && (yP >=zero_y+cell && yP <= hieght+cell))
     {
@@ -107,101 +114,131 @@ void Field::drawCell(int xP, int yP, CELLS cellType)
     try
     {
         if (cellType == CL_EMPTY)   //  0
-        {
+        { // painter = new QPainter(pm);
 
             if(!myField && countOfShooting>1){
                 countOfShooting--;
-                pntr.setBrush(QBrush(QColor(176,224,230)));
-                pntr.setPen(QPen( QColor(176,224,230)));
-                pntr.drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
-            }
-
-            count--;
-            if(count<0){
-                count=0;
-                emit sendCountCells(count);
-
+                painter->setBrush(QBrush(QColor(176,224,230)));
+                painter->setPen(QPen( QColor(176,224,230)));
+                painter->drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
             }
 
 
-            pntr.setBrush(QBrush(QColor(176,224,230)));
-            pntr.setPen(QPen( QColor(176,224,230)));
-            pntr.drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
+            painter->setBrush(QBrush(QColor(176,224,230)));
+            painter->setPen(QPen( QColor(176,224,230)));
+            painter->drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
 
             //           if (FIELD[c_y-1][c_x-1] == 1)
             //            {
             FIELD[c_x-1][c_y-1] = 0;    // заполняем наш массив клеток
+            if(count <20){
+              count--;
+              if(count<0){
+                  count=0;
+                  emit sendCountCells(count,0);
 
-            emit sendCountCells(count);
+                }
+                 else
+                  emit sendCountCells(count,0);
 
-
+             }
             //            }
 
+           // repaint();
+          //  delete painter;
         }
         if (cellType == CL_CELL)    //  1
         {
-
+           //  painter = new QPainter(pm);
             if(myField){
-
-
-                if (FIELD[c_x-1][c_y-2]==1 || FIELD[c_x-2][c_y-1]==1 || FIELD[c_x][c_y-1]==1 || FIELD[c_x-1][c_y]==1){
+                int i = c_x-1, j = c_y-1;
+              if(editingMode == true){//TO checking
+                if (FIELD[i-1][j]==1 || FIELD[i+1][j]==1 || FIELD[i][j+1]==1 || FIELD[i][j-1]==1){
                     QMessageBox::information(this, tr("Atantion!"),tr("You need more space!"));
                     return;
                 }
-                QPixmap  ship(":/ship.jpg");
-                pntr.drawPixmap(c_x*cell+1, c_y*cell+1,cell-2,cell-2,ship);
+              }
+
+                QPixmap  *ship = new QPixmap(":/ship.jpg");
+                painter->drawPixmap(c_x*cell+1, c_y*cell+1,cell-2,cell-2,*ship);
+                repaint();
+
+                delete ship;
                 FIELD[c_x-1][c_y-1] = 1;
-                emit sendCountCells(count); // TODO убрать у противника!! MD!!! в коннектах
+
             }else{
-                qDebug()<<" aim  E";
+
                 if(countOfShooting<1){
-                    QPixmap  target(":/target.jpg"); // отросовка прицела
-                    pntr.drawPixmap(c_x*cell+1, c_y*cell+1,cell-2,cell-2,target);
+
+                       QPixmap  *target = new QPixmap(":/target.jpg"); // отросовка прицела
+
+                    painter->drawPixmap(c_x*cell+1, c_y*cell+1,cell-2,cell-2,*target);
+                    repaint();
+
+                    delete target;
                     if( FIELD[c_x-1][c_y-1]==0)
                         FIELD[c_x-1][c_y-1]=-10;
-                    if( FIELD[c_x-1][c_y-1]==1)
-                        FIELD[c_x-1][c_y-1]= 10;
+                    if( FIELD[c_x-1][c_y-1]==1){
+                        int i = c_x-1, j = c_y-1;
+                         FIELD[i][j]= 10;
+
+                        if(i != 0 )  FIELD[i-1][j] = -10;
+                        if(i != 9 ) FIELD[i+1][j] = -10;
+                        if(j != 0 )  FIELD[i][j-1] = -10;
+                        if(j != 9 ) FIELD[i][j+1] = -10;
+
+                    }
                      countOfShooting++;
+                     fireBtnOnOff();
+                         emit sendCountCells(count,0);
                 }else{
                     countOfShooting--;
-                    pntr.setBrush(QBrush(QColor(176,224,230)));
-                    pntr.setPen(QPen( QColor(176,224,230)));
-                    pntr.drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
+                    painter->setBrush(QBrush(QColor(176,224,230)));
+                    painter->setPen(QPen( QColor(176,224,230)));
+                    painter->drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
                     QMessageBox::information(this, tr("Atantion!"),tr("Only 1 shoot!"));
                 }
 
 
             }
 
-            count++;
-                emit sendCountCells(count);
+            if(count <20){
+                count++;
+                    emit sendCountCells(count,0);
+            }
 
 
+          //   delete painter;
         }
         if (cellType == CL_DOT)     //  мимо целиы
-        {
-            pntr.setBrush(QBrush(QColor(0,0,255)));
-            pntr.setPen(QPen(QColor(176,224,230)));
-            // рисование круга небольшим костылем, т.к. я не знал,
-            // как его сделать ровно по центру клетки
-            pntr.drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
-            // FIELD[c_x-1][c_y-1] = 2;
+        { // painter = new QPainter(pm);
+            painter->setBrush(QBrush(QColor(0,0,255)));
+            painter->setPen(QPen(QColor(176,224,230)));
+            painter->drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
+            repaint();
+          //  delete painter;
+
         }
         if (cellType == CL_INJURED) //  3 - т.е раненая клетка
-        {
-            QPixmap  burn3(":/burns/burn3.jpg"); // отросовка взрыва
-            pntr.drawPixmap(c_x*cell+1, c_y*cell+1,cell-2,cell-2,burn3);
+        { //painter = new QPainter(pm);
 
+               QPixmap  *burn3 = new QPixmap(":/burns/burn3.jpg");
+          // отросовка взрыва
+            painter->drawPixmap(c_x*cell+1, c_y*cell+1,cell-2,cell-2,*burn3);
+            repaint();
+
+            delete burn3;
+           // delete painter;
         }
 
 
     }
     catch (...)
     {
-
+      qDebug()<<"Error in prosseing drawing";
     }
-    update();
 
+  update();
 }
 
 void Field::endEditing()
@@ -215,12 +252,13 @@ void Field::endEditing()
 
 void Field::clean()
 {    count = 0;
+
      editingMode =true;
       pm->fill(QColor(176,224,230));
        for (int i = 0; i < 10; i++)
            for (int j = 0; j < 10; j++)
                FIELD[i][j] = 0;
-        emit sendCountCells(count);
+        emit sendCountCells(count,0);
         drawField();
 }
 
@@ -283,21 +321,23 @@ void Field::drawPlayField()
 
 QString Field::getField()
 {
-    QString temp;
+    QString temp, str;
     for (int i = 0; i < 10; i++)
     {
         for (int j = 0; j < 10; j++)
         {
             temp.append(QString::number(FIELD[i][j])).append(",");
+            str.append(QString::number(FIELD[j][i])).append(",");
         }
-
+          qDebug()<<str;
+          str.clear();
     }
     int pos = temp.lastIndexOf(QChar(','));
     temp =temp.left(pos);
-    // QMessageBox::information(this, "debug", temp);
-    qDebug()<<"getField()"<<playerName;
-    qDebug()<<temp;
-    qDebug()<<"End of  getField() "<<playerName;
+//    // QMessageBox::information(this, "debug", temp);
+//    qDebug()<<"getField()"<<playerName;
+//    qDebug()<<temp;
+//    qDebug()<<"End of  getField() "<<playerName;
     return temp;
 }
 
@@ -342,17 +382,15 @@ void Field::fillEnemyFieldFromConnect(QString str){
 void Field::drawRandomPos(){
 
     int ship, count1 =0;
-
     clean();
     srand(time(NULL));
 
-
-    while(count1 < 19){
+    while(count1 < 20){
 
         for (int i = 0; i < 10; i++){
-            int j = rand()%11;
+            int j = rand()%10;
             for (; j < 10; j++)
-                if(count1 >19)
+                if(count1 >20)
                     break;
                 else if (FIELD[i][j-1]==1 || FIELD[i-1][j]==1 || FIELD[i+1][j]==1 || FIELD[i][j+1]==1 )
                     continue;
@@ -400,6 +438,13 @@ void Field::drawWithoutLiveShip(){
         }
     }
 
+}
+int Field::getDeadShip(){
+    int deadShip=0;
+    for (int i = 0; i < 10; i++)
+        for (int j = 0; j < 10; j++)
+            if(FIELD[j][i] == 10)deadShip++;
+    return deadShip;
 }
 
 void Field::checkEnemyBattleField(int i, int j){

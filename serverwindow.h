@@ -27,6 +27,7 @@ private slots:
     void on_stoping_clicked();
     void newuser();
     void slotReadClient();
+
 private:
     Ui::ServerWindow *ui;
     QTcpServer *tcpServer;

@@ -5,38 +5,39 @@ Window::Window(QWidget *parent) : QWidget(parent)
     My = new MyField(300,300);
     Enemy = new EnemyField(300, 300);
 
-    lblMyCount = new QPushButton(tr("Cells are: 0/20"), this);
+    lblMyCount = new QPushButton(tr("Cells are: 0/0"), this);
     server     = new QPushButton(tr("Server"),this);
+    server->setEnabled(false);
     client    = new QPushButton(tr("Client"),this);
+    client->setEnabled(false);
     cleanField = new QPushButton(tr("Clean"),this);
     randomPos = new QPushButton(tr("Random position ships"),this);
     fire      = new QPushButton(tr("Fire!!!"),this);
+    fire->setEnabled(false);
     playWithComp = new QPushButton(tr("Play with computer"),this);
+    playWithComp->setEnabled(false);
 
-
-    lblEnemyCount = new QPushButton(tr("Quintity enemy's cells: 0/20"), this);
+    lblEnemyCount = new QPushButton(tr("Cells are : 0/0"), this);
     lblEnemyCount->setEnabled(false);
     lblMyCount->setEnabled(false);
 
-    debEn = new  QLabel(tr("Enemy's battle field"), this);
-    debEn->setGeometry(QRect(SCREEN_WIDTH/2+35 , 20, 500, 20));
 
-    debMy = new  QLabel(tr("My battle field"), this);
-       debMy->setGeometry(QRect(40, 20, 500, 20));
+
 
     QVBoxLayout *leftField = new QVBoxLayout();
+    leftField->addWidget(lblMyCount);
     leftField->addWidget(My);
     leftField->addWidget(randomPos);
     leftField->addWidget(cleanField);
     leftField->addWidget(server);
     leftField->addWidget(client);
-    leftField->addWidget(lblMyCount);
+
 
     QVBoxLayout *rightField = new QVBoxLayout();
+    rightField->addWidget(lblEnemyCount);
     rightField->addWidget(Enemy);
     rightField->addWidget(fire);
     rightField->addWidget(playWithComp);
-    rightField->addWidget(lblEnemyCount);
 
 
     QGridLayout *lay = new QGridLayout(this);
@@ -51,11 +52,12 @@ Window::Window(QWidget *parent) : QWidget(parent)
     connect(My, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
     connect(Enemy, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
 
-    connect(My, SIGNAL(sendCountCells(int)), this, SLOT(setMyCountOfCells(int)));
-    connect(Enemy, SIGNAL(sendCountCells(int)), this, SLOT(setEnemyCountOfCells(int)));
+    connect(My, SIGNAL(sendCountCells(int,int)), this, SLOT(setMyCountOfCells(int,int)));
+    connect(Enemy, SIGNAL(sendCountCells(int,int)), this, SLOT(setEnemyCountOfCells(int,int)));
     connect(server,SIGNAL(clicked(bool)),this,SLOT(startServer()));
      connect(client,SIGNAL(clicked(bool)),this,SLOT(startClient()));
      connect(fire,SIGNAL(clicked(bool)),this,SLOT(fireToEnemy()));
+     connect(Enemy,SIGNAL(fireBtnOnOff()),this,SLOT(fireBtnOffOnSet()));
      connect(playWithComp,SIGNAL(clicked(bool)),this,SLOT(startPlayWithComp()));
     // отключение редактирования
     connect(lblMyCount, SIGNAL(clicked(bool)), My, SLOT(endEditing()));
@@ -68,6 +70,8 @@ Window::Window(QWidget *parent) : QWidget(parent)
 //    connect(debMy, SIGNAL(clicked(bool)), My, SLOT(getField()));
       connect(randomPos,SIGNAL(clicked(bool)),My,SLOT(drawRandomPos()));
        connect(cleanField,SIGNAL(clicked(bool)),My,SLOT(clean()));
+         connect(cleanField,SIGNAL(clicked(bool)),Enemy,SLOT(clean()));
+         connect(cleanField,SIGNAL(clicked(bool)),this,SLOT(freeButtons()));
 }
 
 void Window::getMouseCoord(int x, int y)
@@ -76,30 +80,39 @@ void Window::getMouseCoord(int x, int y)
 //    qDebug() << QString("X: %1; Y: %2").arg(QString::number(x)).arg(QString::number(y));
 }
 
-void Window::setMyCountOfCells(int myCountCells)
+void Window::setMyCountOfCells(int myCountCells,int myCountCellsDead)
 {
+    Q_UNUSED(myCountCellsDead);
 
-    lblMyCount->setText(QString("Cells are: %1/20").arg(QString::number(myCountCells)));
+   // lblMyCount->setText(QString("Cells are: %1/20").arg(QString::number(myCountCells)));
+     lblMyCount->setText(QString(tr("My battle field: %1/0"))
+                       .arg(QString::number(myCountCells)));
 
     if (myCountCells == 20){
         My->setEnabled(false);
         My->endEditing();
-        lblMyCount->setEnabled(true);
-        Enemy->setEnabled(true);
-        Enemy->startEditing();
-         lblMyCount->setText(QString("FIX IT (cells are: %1/20)").arg(QString::number(myCountCells)));
+        freeButtons();
+
+         playWithComp->setEnabled(true);
+
     }
     else{
-        freeButtons();
+        //freeButtons();
         lblMyCount->setEnabled(false);
         My->setEnabled(true);
         Enemy->setEnabled(false);
+        server->setEnabled(false);
+        client->setEnabled(false);
+        playWithComp->setEnabled(false);
     }
 }
 
-void Window::setEnemyCountOfCells(int enemyCountCells)
+void Window::setEnemyCountOfCells(int enemyCountCells, int enemyCountCellsDead)
 {
-    Q_UNUSED(enemyCountCells)
+   Q_UNUSED(enemyCountCells);
+    Q_UNUSED(enemyCountCellsDead);
+    lblEnemyCount->setText(QString(tr("Enemy's battle field: 20/%1"))
+                      .arg(QString::number(Enemy->getDeadShip())));
 //    lblEnemyCount->setText(QString(tr("Quintity of cells: %1/20")).arg(QString::number(enemyCountCells)));
 //    if (enemyCountCells == 20)
 //        lblEnemyCount->setEnabled(true);
@@ -117,6 +130,9 @@ void Window::startServer(){
     serverWindow->setEnemyFild(Enemy);
     client->setEnabled(false);
     playWithComp->setEnabled(false);
+    randomPos->setEnabled(false);
+   //  fire->setEnabled(true); // after synch
+   compPlayer = 0;
     serverWindow->show();
 }
 void Window::startClient(){
@@ -129,6 +145,9 @@ void Window::startClient(){
      clientWindow ->setEnemyFild(Enemy);
      server->setEnabled(false);
      playWithComp->setEnabled(false);
+      randomPos->setEnabled(false);
+    //  fire->setEnabled(true); // after synch
+      compPlayer = 0;
      clientWindow->show();
 }
 
@@ -140,12 +159,18 @@ void Window::startPlayWithComp(){
       compPlayer = new CompAsPlayer();
       compPlayer->setMyFild(My);
       compPlayer->setEnemyFild(Enemy);
+        Enemy->startEditing();
+      Enemy->setEnabled(true);
+       randomPos->setEnabled(false);
+        playWithComp->setEnabled(false);
+
 
     }
 void Window::freeButtons(){
     server ->setEnabled(true);
     client->setEnabled(true);
     playWithComp->setEnabled(true);
+     randomPos->setEnabled(true);
 }
 Field* Window::getFieldClass(){
     return NULL;
@@ -155,4 +180,15 @@ void Window::fireToEnemy(){
 
     if(compPlayer !=0)
         compPlayer->fireComp();
+    fire->setEnabled(false);
+
+    lblEnemyCount->setText(QString(tr("Enemy's battle field: 20/%1"))
+                      .arg(QString::number(Enemy->getDeadShip())));
+    lblMyCount->setText(QString(tr("My battle field: 20/%1"))
+                      .arg(QString::number(My->getDeadShip())));
 }
+
+void Window::fireBtnOffOnSet(){
+    fire->setEnabled(true);
+}
+
