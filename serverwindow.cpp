@@ -1,6 +1,6 @@
 #include "serverwindow.h"
 #include "ui_serverwindow.h"
-#include "window.h"
+#include "window_sea_fight.h"
 ServerWindow::ServerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ServerWindow)
@@ -67,26 +67,73 @@ void ServerWindow::newuser()
 
 void ServerWindow::slotReadClient()
 {
-    QTcpSocket* clientSocket = (QTcpSocket*)sender();
+    QTcpSocket* clientSocket = (QTcpSocket*)sender(); // ловлю сокет клиента
     int idusersocs=clientSocket->socketDescriptor();
     QString str = QString::fromUtf8(clientSocket->readAll());
-    QStringList pieces = str.split("/");
-     ui->textinfo->append("Client from:"+str+"\n");
-     QTextStream os(clientSocket);
-      os.setAutoDetectUnicode(true);
+     qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
 
-   if( pieces[0]== passwd){ // можно грохнуть через телнет (passwd лялялялл)
-       str.clear();
-       str.append(passwd).append("/").append(MyField->getField()).append("/");
-    //   qDebug()<<pieces[0] <<" pieces[0]"<<  passwd ;
-       if(pieces.size()>2 )
-       EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+     QStringList pieces;
+     if(str.length()>passwd.length()) // if word bigger then password
+                 pieces = str.split("/");
 
-       os << str
-          <<"\n"
-          << QTime::currentTime().toString() << "\n";
-      ui->textinfo->append("Client to:"+str+"\n");
-   }else{
+    QTextStream os(clientSocket);
+     os.setAutoDetectUnicode(true);
+    if(str==passwd){ // с клиента приходи пароль первый раз 1 шаг
+              ui->textinfo->append("From client first connenct password: "+str+" "+QTime::currentTime().toString()+"\n");
+              str.clear();
+              str.append(passwd).append("synch").append("/")
+                 .append(MyField->getField()).append("/")//  массив моего поля
+                 .append("1").append("/");//MyField->myShoot
+              os << str //  2 шаг отправляю клиенту пароль  плюс моего поля
+                 <<"\n"
+                 << QTime::currentTime().toString() << "\n";
+              ui->textinfo->append("To Client (sync) my battle field:"+str+" "+QTime::currentTime().toString()+"\n");
+          }
+
+    else if(pieces.size()>2 && pieces[0].startsWith(passwd) && pieces[0].endsWith("synch")) //3 step
+    {
+           ui->textinfo->append("From Client (synch): "+str+" "+QTime::currentTime().toString()+"\n");
+
+
+            //  if( pieces[0]== passwd){ // можно грохнуть через телнет (passwd лялялялл)
+                  str.clear();
+//                  str.append(passwd).append("synch").append("/")
+//                     .append(MyField->getField()).append("/")//  массив моего поля
+//                     .append("1").append("/");//MyField->myShoot
+
+//                      if(pieces.size()>2 )
+                         EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+
+//                  os << str
+//                     <<"\n"
+//                     << QTime::currentTime().toString() << "\n";
+                 ui->textinfo->append("The end of synch "+QTime::currentTime().toString()+"\n");
+            //  }
+
+
+
+     }else if(MyField->myShoot && pieces.size()>3 && pieces[0]== passwd) //4 step  (shooting)
+    {
+           ui->textinfo->append("From Client (shoot):"+str+QTime::currentTime().toString()+"\n");
+           MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
+
+                  str.clear();
+                  str.append(passwd).append("/")
+                     .append(MyField->getField()).append("/")//  массив моего поля
+                     .append("1").append("/");//MyField->myShoot
+
+                      if(pieces.size()>2 )
+                         EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+
+                  os << str
+                     <<"\n"
+                     << QTime::currentTime().toString() << "\n";
+                 ui->textinfo->append("To client (shoot):"+str+"\n");
+
+
+
+
+    }else{
         os << "You not our friend!!! :"
            << QDateTime::currentDateTime().toString() << "\n";
 

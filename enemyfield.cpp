@@ -3,8 +3,8 @@
 EnemyField::EnemyField(int hX, int hY)
 {
     pm = new QPixmap(hX, hY);
-    pm->fill();
-    drawNonActiveField();
+    pm->fill(Qt::gray);
+   // drawNonActiveField();
     width = hX;
     hieght = hY;
     zero_x = hX / 10;
@@ -14,20 +14,27 @@ EnemyField::EnemyField(int hX, int hY)
     playerName = "Enemy player";
     myField = false;
 
+    count = 0;  // первоначально на поле 0 расставленых клеток
+
+    // очищаем массив клеток на всякий случай
+    for (int i = 0; i < 10; i++)
+        for (int j = 0; j < 10; j++)
+            FIELD[i][j] = 0;
+
 }
 
 void EnemyField::startEditing()
 {
-    QMessageBox::information(this, "Position ships", QString("Now %1 position ships").arg(playerName));
+//    QMessageBox::information(this, "Position ships", QString("Now %1 position ships").arg(playerName));
     editingMode = true;
-    pm->fill();
-    drawField();
+//    pm->fill();
+//    drawField();
 }
 
 void EnemyField::endEditing()
 {
     editingMode = false;
-    emit startingGame();
+//    emit startingGame();
 }
 
 

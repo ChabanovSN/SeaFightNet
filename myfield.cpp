@@ -19,13 +19,18 @@ MyField::MyField(int hX, int hY)
     drawField();
     playerName = " I'm player";
 
+    count = 0;  // первоначально на поле 0 расставленых клеток
+
+    // очищаем массив клеток на всякий случай
+    for (int i = 0; i < 10; i++)
+        for (int j = 0; j < 10; j++)
+            FIELD[i][j] = 0;
 
 }
 
-//void  MyField::endEditing() override{
-//    editingMode = false;
-
-//}
+void MyField::endEditing(){
+    editingMode =  !editingMode;
+}
 
 //void MyField::startEditing()
 //{

@@ -1,4 +1,4 @@
-#include "window.h"
+#include "window_sea_fight.h"
 #include <QApplication>
 #include <QtPlugin>
 #include <QTranslator>

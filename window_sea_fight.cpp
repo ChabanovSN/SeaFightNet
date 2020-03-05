@@ -1,4 +1,4 @@
-#include "window.h"
+#include "window_sea_fight.h"
 
 Window::Window(QWidget *parent) : QWidget(parent)
 {
@@ -14,7 +14,7 @@ Window::Window(QWidget *parent) : QWidget(parent)
     playWithComp = new QPushButton(tr("Play with computer"),this);
 
 
-    lblEnemyCount = new QPushButton(tr("Quintity cells: 0/20"), this);
+    lblEnemyCount = new QPushButton(tr("Quintity enemy's cells: 0/20"), this);
     lblEnemyCount->setEnabled(false);
     lblMyCount->setEnabled(false);
 
@@ -50,6 +50,7 @@ Window::Window(QWidget *parent) : QWidget(parent)
     // TODO: Сделать, чтобы в выводе писало с какого поля был клик
     connect(My, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
     connect(Enemy, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
+
     connect(My, SIGNAL(sendCountCells(int)), this, SLOT(setMyCountOfCells(int)));
     connect(Enemy, SIGNAL(sendCountCells(int)), this, SLOT(setEnemyCountOfCells(int)));
     connect(server,SIGNAL(clicked(bool)),this,SLOT(startServer()));
@@ -71,18 +72,21 @@ Window::Window(QWidget *parent) : QWidget(parent)
 
 void Window::getMouseCoord(int x, int y)
 {
-    My->getFieldByXY(x,y);
-    qDebug() << QString("X: %1; Y: %2").arg(QString::number(x)).arg(QString::number(y));
+//    My->getFieldByXY(x,y);
+//    qDebug() << QString("X: %1; Y: %2").arg(QString::number(x)).arg(QString::number(y));
 }
 
 void Window::setMyCountOfCells(int myCountCells)
 {
+
     lblMyCount->setText(QString("Cells are: %1/20").arg(QString::number(myCountCells)));
 
-    if (myCountCells >= 20){
+    if (myCountCells == 20){
         My->setEnabled(false);
+        My->endEditing();
         lblMyCount->setEnabled(true);
         Enemy->setEnabled(true);
+        Enemy->startEditing();
          lblMyCount->setText(QString("FIX IT (cells are: %1/20)").arg(QString::number(myCountCells)));
     }
     else{
@@ -103,7 +107,8 @@ void Window::setEnemyCountOfCells(int enemyCountCells)
 //        lblEnemyCount->setEnabled(false);
 }
 void Window::startServer(){
-    My->myShoot=true;// если первый вестрел за вами
+     setWindowTitle(tr("You play like SERVER"));
+    My->myShoot=false;// если первый вестрел за вами
     Enemy->myShoot=false;
 
      qDebug() << QString("Start server");
@@ -115,7 +120,8 @@ void Window::startServer(){
     serverWindow->show();
 }
 void Window::startClient(){
-     My->myShoot=false;// если вы клиент то первый выстрел за сервером
+    setWindowTitle(tr("You play like CLIENT"));
+     My->myShoot=true;// если вы клиент то первый выстрел за сервером но первое тру для синхронизации
      Enemy->myShoot=true;
      qDebug() << QString("Start client");
      clientWindow = new ClientDialog();
@@ -127,12 +133,15 @@ void Window::startClient(){
 }
 
 void Window::startPlayWithComp(){
-    My->myShoot=true;// если первый вестрел за вами
-    Enemy->myShoot=false;
+      My->myShoot=true;// если первый вестрел за вами
+      Enemy->myShoot=false;
       server ->setEnabled(false);
       client->setEnabled(false);
-      Enemy->drawRandomPos();
-}
+      compPlayer = new CompAsPlayer();
+      compPlayer->setMyFild(My);
+      compPlayer->setEnemyFild(Enemy);
+
+    }
 void Window::freeButtons(){
     server ->setEnabled(true);
     client->setEnabled(true);
@@ -143,5 +152,7 @@ Field* Window::getFieldClass(){
 }
 
 void Window::fireToEnemy(){
-    qDebug()<< " Fire";
+
+    if(compPlayer !=0)
+        compPlayer->fireComp();
 }

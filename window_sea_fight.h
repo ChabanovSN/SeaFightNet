@@ -14,7 +14,7 @@
 #include "enemyfield.h"
 #include "serverwindow.h"
 #include "clientdialog.h"
-
+#include "compasplayer.h"
 
 #define SCREEN_WIDTH  1000
 #define SCREEN_HIEGHT 600
@@ -27,6 +27,7 @@ public:
     explicit Window(QWidget *parent = 0);
     MyField *My;
     EnemyField *Enemy;
+    CompAsPlayer *compPlayer = 0;
     // Не спрашивайте, почему я вместо лейблов поставил кнопки
     QPushButton *lblMyCount;     // эти надписи будут показывать
     QPushButton *lblEnemyCount;  // сколько клеток расставлено по полям

@@ -3,5 +3,9 @@
         <file>sea_bg.jpg</file>
         <file>ship.jpg</file>
         <file>target.jpg</file>
+        <file>burns/burn1.jpg</file>
+        <file>burns/burn2.jpg</file>
+        <file>burns/burn3.jpg</file>
+        <file>burns/burn4.jpg</file>
     </qresource>
 </RCC>

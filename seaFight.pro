@@ -16,17 +16,19 @@ SOURCES += main.cpp\
     field.cpp \
     myfield.cpp \
     enemyfield.cpp \
-    window.cpp \
     serverwindow.cpp \
-    clientdialog.cpp
+    clientdialog.cpp \
+    compasplayer.cpp \
+    window_sea_fight.cpp
 
 HEADERS  += \
     field.h \
     myfield.h \
     enemyfield.h \
-    window.h \
     serverwindow.h \
-    clientdialog.h
+    clientdialog.h \
+    compasplayer.h \
+    window_sea_fight.h
 
 FORMS    += \
     serverwindow.ui \

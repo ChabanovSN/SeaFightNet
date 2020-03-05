@@ -19,6 +19,7 @@ public:
     int count;
     bool myField=true; // булева для выбора варианта отрисовки
     bool myShoot=true; //чей ход ходить
+    int FIELD[10][10];
 protected:
     virtual void paintEvent(QPaintEvent *event);
     QPixmap *pm;
@@ -31,12 +32,12 @@ protected:
     int zero_x; //  НУЛЕВЫЕ ТОЧКИ,
     int zero_y; //  с которых идет рисование поля
     int cell;   //  размер(сторона) одной клетки
-    int FIELD[10][10]; // собственно, поле
+   // собственно, поле
     int countOfShooting=0; // это для прицела что бы был только один выстрел
     // колличество расставленных клеток на поле
     void mousePressEvent(QMouseEvent *event);
     virtual void drawField();
-    virtual int drawCell(int x, int y, CELLS cellType = CL_CELL);
+    virtual void drawCell(int x, int y, CELLS cellType = CL_CELL);
     virtual void drawNonActiveField();   // для нарисовки неактивного поля(понадобится в начале игры)
 
 
@@ -51,7 +52,7 @@ signals:
 
 public slots:
     void clean();
-    void drawRandomPos();
+    void drawRandomPos(); //рандомная отрисовка
     virtual void endEditing();  // слот для отключения режима редактирования клеток
     void setName(const QString &name);  // слот для задания имени игрока
     virtual void startEditing();    // разрешать редактирование своих ячеек
@@ -60,7 +61,9 @@ public slots:
      QString getField();
      void getFieldByXY( int x, int y);
      void fillEnemyFieldFromConnect(QString  str);
-
+     void drawWithoutLiveShip();
+private:
+     void checkEnemyBattleField(int i,int j);
 };
 
 #endif // FIELD_H

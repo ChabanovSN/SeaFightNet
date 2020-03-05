@@ -1,6 +1,6 @@
 #include "clientdialog.h"
 #include "ui_clientdialog.h"
-#include "window.h"
+#include "window_sea_fight.h"
 #include <QtGui>
 #include <QDebug>
 
@@ -57,24 +57,48 @@ void ClientDialog::onSokReadyRead(){
 
 
     QString str = QString::fromUtf8(clientSocket.readAll());
-    QStringList pieces = str.split("/");
-     qDebug()<<pieces.size()<<"SIZE!!!!!!!!!!!!!"<<str;
-    AddToLog("Server from :"+str+"\n");
+     qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
+     QStringList pieces;
+     if(str.length()>passwd.length()) // if word bigger then password
+                 pieces = str.split("/");
+
     QTextStream os(&clientSocket);
     os.setAutoDetectUnicode(true);
-    // qDebug()<<pieces[0] <<" pieces[0]"<<  passwd<<  clientSocket.isOpen();
-  //  if( pieces[0] != passwd){
-        // EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+    if(str.length()==0){ // получаю первый ответ от сервера (пустая строка) 1
+          AddToLog("From server  1 step empry answer :"+str+QTime::currentTime().toString()+"\n");
+     os<<passwd; // отправляю пароль 2
+          AddToLog("To server 1 step password :"+passwd+" "+QTime::currentTime().toString()+"\n");
+    }
+   else   if(pieces.size()>2 && pieces[0].startsWith(passwd) && pieces[0].endsWith("synch")){
+
+        AddToLog("From server (synch):"+str+QTime::currentTime().toString()+"\n");
+            str.clear();
+            str.append(passwd).append("synch").append("/").append(MyField->getField()).append("/");
+               EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+            os << str
+            <<"\n"
+            << QTime::currentTime().toString() << "\n";
+            AddToLog("To server (synch):"+str+"\n"+QTime::currentTime().toString()+"\n");
+           //  clientSocket.close();
+
+
+}else if( MyField->myShoot && pieces.size()>4){
+         MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
+                                //(клинет т оже начинает с MyField->myShoot=true для синхронизации
+
+    qDebug()<<pieces.size()<<"SIZE!!!!!!!!!!!!!"<<str;
+    AddToLog("Server from :"+str+QTime::currentTime().toString()+"\n");
         str.clear();
         str.append(passwd).append("/").append(MyField->getField()).append("/");
          if(pieces.size()>2 )
-        EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+             EnemyField->fillEnemyFieldFromConnect(pieces[1]);
         os << str
         <<"\n"
         << QTime::currentTime().toString() << "\n";
-         AddToLog("Server to:"+str+"\n");
+        AddToLog("Server to:"+str+"\n"+QTime::currentTime().toString()+"\n");
        //  clientSocket.close();
    // }
+    }
 }
 
 

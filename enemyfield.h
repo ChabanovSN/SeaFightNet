@@ -9,7 +9,7 @@ class EnemyField : public Field
 public:
     EnemyField(int hX, int hY);
     int FIELD[10][10]; // собственно, поле
-private slots:
+public slots:
     void startEditing();// слот для включения режима редактирования клеток
     void endEditing();  // закрываем доступ к редактированию и, собственно, начинаем игру
 
