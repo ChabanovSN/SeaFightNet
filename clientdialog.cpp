@@ -60,7 +60,7 @@ void ClientDialog::onSokReadyRead(){
             str.clear();
             str.append(passwd).append("/")
                     .append(MyField->getField()).append("/")
-                    .append("1").append("/")
+                    .append("c").append("/")
                     .append(EnemyField->getField()).append("/");  //second array pieces[3]
 
             os << str
@@ -97,7 +97,7 @@ void ClientDialog::onSokReadyRead(){
            //  clientSocket.close();
            str.clear();
 
-}else if(!MyField->myShoot && EnemyField->myShoot && pieces.size()>3 && pieces[0]== passwd){
+}else if(!MyField->myShoot && pieces.size()>3 && pieces[0]== passwd && pieces[2]== "s"){
 
 
         AddToLog("Server from (shoot) :"+str+QTime::currentTime().toString()+"\n");

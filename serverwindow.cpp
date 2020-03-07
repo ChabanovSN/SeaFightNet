@@ -82,7 +82,7 @@ void ServerWindow::slotReadClient()
                    str.clear();
                       str.append(passwd).append("/")
                          .append(MyField->getField()).append("/")//  массив моего поля first array pieces[1]
-                         .append("1").append("/")//MyField->myShoot
+                         .append("s").append("/")//MyField->myShoot
                          .append(EnemyField->getField()).append("/"); //second array pieces[3]
                      os << str
                          <<"\n"
@@ -120,7 +120,7 @@ void ServerWindow::slotReadClient()
            ui->textinfo->append("The end of synch "+QTime::currentTime().toString()+"\n");
          //  os<<passwd+"/"+"The end of synch"+"/"+QTime::currentTime().toString();
     }else
-    if(!MyField->myShoot && EnemyField->myShoot && pieces.size()>3 && pieces[0]== passwd)//4 step  (shooting)
+    if(!MyField->myShoot  && pieces.size()>3 && pieces[0]== passwd && pieces[2]== "c")//4 step  (shooting)
         {
                ui->textinfo->append("From Client (shoot):"+str+QTime::currentTime().toString()+"\n");
                MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
