@@ -26,7 +26,7 @@ private slots:
     void on_starting_clicked();
     void on_stoping_clicked();
     void newuser();
-    void slotReadClient();
+
 
 private:
     Ui::ServerWindow *ui;
@@ -34,11 +34,16 @@ private:
     int server_status;
     QMap<int,QTcpSocket *> SClients;
     QString passwd;
-    Field *MyField;
-    Field *EnemyField;
+//    Field *MyField;
+//    Field *EnemyField;
+public slots:
+     void slotReadClient();
 public:
     void setMyFild(Field  *field = 0);
     void setEnemyFild(Field  *field = 0);
+    Field *MyField;
+    Field *EnemyField;
+    QTcpSocket* clientSocket;
 };
 
 #endif // SERVERWINDOW_H

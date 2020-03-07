@@ -39,7 +39,7 @@ void ServerWindow::on_stoping_clicked()
         foreach(int i,SClients.keys()){
             QTextStream os(SClients[i]);
             os.setAutoDetectUnicode(true);
-            os << QDateTime::currentDateTime().toString() << "\n";
+            os << QTime::currentTime().toString() << "\n";
             SClients[i]->close();
             SClients.remove(i);
         }
@@ -56,7 +56,7 @@ void ServerWindow::newuser()
     if(server_status==1){
         qDebug() << QString::fromUtf8("У нас новое соединение!");
         ui->textinfo->append(QString::fromUtf8("У нас новое соединение!"));
-        QTcpSocket* clientSocket=tcpServer->nextPendingConnection();
+        clientSocket=tcpServer->nextPendingConnection();
 
          ui->textinfo->append("Ip: " +  clientSocket->peerAddress().toString());
         int idusersocs=clientSocket->socketDescriptor();
@@ -67,8 +67,31 @@ void ServerWindow::newuser()
 
 void ServerWindow::slotReadClient()
 {
-    QTcpSocket* clientSocket = (QTcpSocket*)sender(); // ловлю сокет клиента
+       if (clientSocket == 0)
+              clientSocket = (QTcpSocket*)sender(); // ловлю сокет клиента
     int idusersocs=clientSocket->socketDescriptor();
+    QTextStream os(clientSocket);
+     os.setAutoDetectUnicode(true);
+
+    if(MyField->myShoot) //4 step  (shooting)
+        {
+
+               MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
+
+                   QString str ="";
+                   str.clear();
+                      str.append(passwd).append("/")
+                         .append(MyField->getField()).append("/")//  массив моего поля first array pieces[1]
+                         .append("1").append("/")//MyField->myShoot
+                         .append(EnemyField->getField()).append("/"); //second array pieces[3]
+                     os << str
+                         <<"\n"
+                         << QTime::currentTime().toString() << "\n";
+                     ui->textinfo->append("To client (shoot):"+str+"\n");
+             return;
+        }
+
+
     QString str = QString::fromUtf8(clientSocket->readAll());
      qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
 
@@ -76,72 +99,54 @@ void ServerWindow::slotReadClient()
      if(str.length()>passwd.length()) // if word bigger then password
                  pieces = str.split("/");
 
-    QTextStream os(clientSocket);
-     os.setAutoDetectUnicode(true);
+
     if(str==passwd){ // с клиента приходи пароль первый раз 1 шаг
-              ui->textinfo->append("From client first connenct password: "+str+" "+QTime::currentTime().toString()+"\n");
+              ui->textinfo->append("From client first connenct password: "+QTime::currentTime().toString()+"\n");
               str.clear();
               str.append(passwd).append("synch").append("/")
                  .append(MyField->getField()).append("/")//  массив моего поля
                  .append("1").append("/");//MyField->myShoot
               os << str //  2 шаг отправляю клиенту пароль  плюс моего поля
-                 <<"\n"
-                 << QTime::currentTime().toString() << "\n";
-              ui->textinfo->append("To Client (sync) my battle field:"+str+" "+QTime::currentTime().toString()+"\n");
+
+               << QTime::currentTime().toString();
+              ui->textinfo->append("To Client (sync) my battle field:");
           }
 
-    else if(pieces.size()>2 && pieces[0].startsWith(passwd) && pieces[0].endsWith("synch")) //3 step
+    else if(pieces.size() >1 && pieces[0].startsWith(passwd) && pieces[0].endsWith("synch")) //3 step
     {
-           ui->textinfo->append("From Client (synch): "+str+" "+QTime::currentTime().toString()+"\n");
+           ui->textinfo->append("From Client (synch): "+QTime::currentTime().toString()+"\n");
+           str.clear();
+           EnemyField->fillEnemyFieldFromConnect(pieces[1]);
+           ui->textinfo->append("The end of synch "+QTime::currentTime().toString()+"\n");
+         //  os<<passwd+"/"+"The end of synch"+"/"+QTime::currentTime().toString();
+    }else
+    if(!MyField->myShoot && EnemyField->myShoot && pieces.size()>3 && pieces[0]== passwd)//4 step  (shooting)
+        {
+               ui->textinfo->append("From Client (shoot):"+str+QTime::currentTime().toString()+"\n");
+               MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
 
+               // получили первым массивом pieces[1] поле противника
+             MyField->fillMyFieldFromConnect(pieces[3]);
+               //вторым массивом  мое поле измененное   pieces[3]
+             EnemyField-> fillEnemyFieldFromConnect(pieces[1]);
 
-            //  if( pieces[0]== passwd){ // можно грохнуть через телнет (passwd лялялялл)
-                  str.clear();
-//                  str.append(passwd).append("synch").append("/")
-//                     .append(MyField->getField()).append("/")//  массив моего поля
-//                     .append("1").append("/");//MyField->myShoot
-
-//                      if(pieces.size()>2 )
-                         EnemyField->fillEnemyFieldFromConnect(pieces[1]);
-
-//                  os << str
-//                     <<"\n"
-//                     << QTime::currentTime().toString() << "\n";
-                 ui->textinfo->append("The end of synch "+QTime::currentTime().toString()+"\n");
-            //  }
-
-
-
-     }else if(MyField->myShoot && pieces.size()>3 && pieces[0]== passwd) //4 step  (shooting)
-    {
-           ui->textinfo->append("From Client (shoot):"+str+QTime::currentTime().toString()+"\n");
-           MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
-
-                  str.clear();
-                  str.append(passwd).append("/")
-                     .append(MyField->getField()).append("/")//  массив моего поля
-                     .append("1").append("/");//MyField->myShoot
-
-                      if(pieces.size()>2 )
-                         EnemyField->fillEnemyFieldFromConnect(pieces[1]);
-
-                  os << str
-                     <<"\n"
-                     << QTime::currentTime().toString() << "\n";
-                 ui->textinfo->append("To client (shoot):"+str+"\n");
+                      os << str
+                         <<"\n"
+                         << QTime::currentTime().toString() << "\n";
 
 
 
 
-    }else{
+
+        }else{
         os << "You not our friend!!! :"
-           << QDateTime::currentDateTime().toString() << "\n";
+           << QTime::currentTime().toString() << "\n";
 
        ui->textinfo->append("Someone stranger.... :"+str+"\n");
        clientSocket->close();
        SClients.remove(idusersocs);
    }
- os.flush();
+ //os.flush();
 
 }
 

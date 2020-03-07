@@ -188,7 +188,7 @@ void Field::drawCell(int xP, int yP, CELLS cellType)
                         if(j != 9 ) FIELD[i][j+1] = -10;
 
                     }
-                     countOfShooting++;
+                    // countOfShooting++; !!!!!!!!!!!!1
                      fireBtnOnOff();
                          emit sendCountCells(count,0);
                 }else{
@@ -329,7 +329,7 @@ QString Field::getField()
             temp.append(QString::number(FIELD[i][j])).append(",");
             str.append(QString::number(FIELD[j][i])).append(",");
         }
-          qDebug()<<str;
+        //  qDebug()<<str;
           str.clear();
     }
     int pos = temp.lastIndexOf(QChar(','));
@@ -370,13 +370,38 @@ void Field::getFieldByXY(int x, int y){
 void Field::fillEnemyFieldFromConnect(QString str){
     QStringList pieces = str.split( "," );
     int step = 0;
-
+     QString  str1 = "";
+      qDebug()<<"fillEnemyFieldFromConnect";
     if(pieces.size() == 100){
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; i++){
             for (int j = 0; j < 10; j++){
                 FIELD[i][j] = pieces[step++].toInt();
+                   str1.append(QString::number(FIELD[j][i])).append(",");
             }
+           qDebug()<<str1;
+          str1.clear();
+        }
     }
+    drawWithoutLiveShip();
+
+}
+
+void Field::fillMyFieldFromConnect(QString str){
+    QStringList pieces = str.split( "," );
+    int step = 0;
+ QString  str1="";
+  qDebug()<<"fillMyFieldFromConnect";
+    if(pieces.size() == 100){
+        for (int i = 0; i < 10; i++){
+            for (int j = 0; j < 10; j++){
+                FIELD[i][j] = pieces[step++].toInt();
+                 str1.append(QString::number(FIELD[j][i])).append(",");
+            }
+                qDebug()<<str1;
+                str1.clear();
+        }
+    }
+   drawPlayField();
 
 }
 void Field::drawRandomPos(){

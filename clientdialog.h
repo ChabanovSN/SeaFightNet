@@ -26,13 +26,8 @@ private slots:
     //определим слоты для обработки сигналов сокета
     void onSokConnected();
     void onSokDisconnected();
-
-    void onSokReadyRead();
     void onSokDisplayError(QAbstractSocket::SocketError socketError);
-//private:
-//    void on_pbConnect_clicked();
-//    void on_pbDisconnect_clicked();
-//    void on_pbSend_clicked();
+
 
 private:
     Ui::ClientDialog *ui;
@@ -42,7 +37,8 @@ private:
 
     Field *MyField;
     Field *EnemyField;
-
+public slots:
+     void onSokReadyRead();
 public:
     void setMyFild(Field  *field = 0);
     void setEnemyFild(Field  *field = 0);

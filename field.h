@@ -65,6 +65,7 @@ public slots:
      QString getField();
      void getFieldByXY( int x, int y);
      void fillEnemyFieldFromConnect(QString  str);
+      void fillMyFieldFromConnect(QString  str);
      void drawWithoutLiveShip();
 private:
      void checkEnemyBattleField(int i,int j);
