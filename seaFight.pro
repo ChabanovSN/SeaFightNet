@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     serverwindow.cpp \
     clientdialog.cpp \
     compasplayer.cpp \
-    window_sea_fight.cpp
+    window_sea_fight.cpp \
+    endwindow.cpp
 
 HEADERS  += \
     field.h \
@@ -28,11 +29,13 @@ HEADERS  += \
     serverwindow.h \
     clientdialog.h \
     compasplayer.h \
-    window_sea_fight.h
+    window_sea_fight.h \
+    endwindow.h
 
 FORMS    += \
     serverwindow.ui \
-    clientdialog.ui
+    clientdialog.ui \
+    endwindow.ui
 
 DISTFILES +=
 

@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     qDebug( "Locale: %s", qPrintable(lang) );
     translator.load( ":/" + lang );
     a.installTranslator( &translator );
-    Window w;
+    Window_sea_fight w;
     w.show();
 
     return a.exec();

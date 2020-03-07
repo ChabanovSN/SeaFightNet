@@ -1,6 +1,6 @@
 #include "window_sea_fight.h"
-
-Window::Window(QWidget *parent) : QWidget(parent)
+#include "endwindow.h"
+Window_sea_fight::Window_sea_fight(QWidget *parent) : QWidget(parent)
 {
 
 
@@ -9,25 +9,25 @@ Window::Window(QWidget *parent) : QWidget(parent)
     QPalette palette;
     palette.setBrush(QPalette::Background, bkgnd);
     this->setPalette(palette);
-
-
-
+    endWindow = new EndWindow();
+    serverWindow = new ServerWindow();
+     clientWindow = new ClientDialog();
     My = new MyField(300,300);
     Enemy = new EnemyField(300, 300);
 
-    lblMyCount = new QPushButton(tr("Cells are: 0/0"), this);
-    server     = new QPushButton(tr("Server"),this);
+    lblMyCount = new QPushButton(QString::fromUtf8("Клеток на поле: 0/0"), this);
+    server     = new QPushButton(QString::fromUtf8("Вы сервер"),this);
     server->setEnabled(false);
-    client    = new QPushButton(tr("Client"),this);
+    client    = new QPushButton(QString::fromUtf8("Вы клиент"),this);
     client->setEnabled(false);
-    cleanField = new QPushButton(tr("Clean"),this);
-    randomPos = new QPushButton(tr("Random position ships"),this);
-    fire      = new QPushButton(tr("Fire!!!"),this);
+    cleanField = new QPushButton(QString::fromUtf8("Очистить поля"),this);
+    randomPos = new QPushButton(QString::fromUtf8("Случайное поле боя"),this);
+    fire      = new QPushButton(QString::fromUtf8("Огонь!!!"),this);
     fire->setEnabled(false);
-    playWithComp = new QPushButton(tr("Play with computer"),this);
+    playWithComp = new QPushButton(QString::fromUtf8("Играть с компьютером"),this);
     playWithComp->setEnabled(false);
 
-    lblEnemyCount = new QPushButton(tr("Cells are : 0/0"), this);
+    lblEnemyCount = new QPushButton(QString::fromUtf8("Клеток на поле : 0/0"), this);
     lblEnemyCount->setEnabled(false);
     lblMyCount->setEnabled(false);
 
@@ -58,9 +58,9 @@ Window::Window(QWidget *parent) : QWidget(parent)
     this->resize(QSize(SCREEN_WIDTH, SCREEN_HIEGHT));
     this->setMinimumSize(QSize(SCREEN_WIDTH/2, SCREEN_HIEGHT/2));
 
-    // TODO: Сделать, чтобы в выводе писало с какого поля был клик
-    connect(My, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
-    connect(Enemy, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
+    //    // TODO: Сделать, чтобы в выводе писало с какого поля был клик
+    //    connect(My, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
+    //    connect(Enemy, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
 
     connect(My, SIGNAL(sendCountCells(int,int)), this, SLOT(setMyCountOfCells(int,int)));
     connect(Enemy, SIGNAL(sendCountCells(int,int)), this, SLOT(setEnemyCountOfCells(int,int)));
@@ -68,8 +68,8 @@ Window::Window(QWidget *parent) : QWidget(parent)
     connect(client,SIGNAL(clicked(bool)),this,SLOT(startClient()));
     connect(fire,SIGNAL(clicked(bool)),this,SLOT(fireToEnemy()));
     // сигналы на сервер и клиент
-//    connect(fire,SIGNAL(clicked(bool)),serverWindow,SLOT(slotReadClient()));
-//    connect(fire,SIGNAL(clicked(bool)),clientWindow,SLOT(onSokReadyRead()));
+    //    connect(fire,SIGNAL(clicked(bool)),serverWindow,SLOT(slotReadClient()));
+    //    connect(fire,SIGNAL(clicked(bool)),clientWindow,SLOT(onSokReadyRead()));
 
     connect(Enemy,SIGNAL(fireBtnOnOff()),this,SLOT(fireBtnOffOnSet()));
     connect(playWithComp,SIGNAL(clicked(bool)),this,SLOT(startPlayWithComp()));
@@ -85,20 +85,26 @@ Window::Window(QWidget *parent) : QWidget(parent)
     connect(cleanField,SIGNAL(clicked(bool)),My,SLOT(clean()));
     connect(cleanField,SIGNAL(clicked(bool)),Enemy,SLOT(clean()));
     connect(cleanField,SIGNAL(clicked(bool)),this,SLOT(freeButtons()));
-}
-//debug
-void Window::getMouseCoord(int x, int y)
-{
-    //    My->getFieldByXY(x,y);
-    //    qDebug() << QString("X: %1; Y: %2").arg(QString::number(x)).arg(QString::number(y));
+
+
+    /// exit/restart
+    connect(endWindow->ext,SIGNAL(clicked(bool)),this,SLOT(close()));
+    connect(endWindow->ext,SIGNAL(clicked(bool)),endWindow,SLOT(close()));
+    connect(endWindow->ext,SIGNAL(clicked(bool)),serverWindow,SLOT(close()));
+    connect(endWindow->ext,SIGNAL(clicked(bool)),clientWindow,SLOT(close()));
+    connect(endWindow->restart,SIGNAL(clicked(bool)),My,SLOT(clean()));
+    connect(endWindow->restart,SIGNAL(clicked(bool)),Enemy,SLOT(clean()));
+    connect(endWindow->restart,SIGNAL(clicked(bool)),this,SLOT(freeButtons()));
+    connect(endWindow->restart,SIGNAL(clicked(bool)),endWindow,SLOT(close()));
 }
 
-void Window::setMyCountOfCells(int myCountCells,int myCountCellsDead)
+
+void Window_sea_fight::setMyCountOfCells(int myCountCells,int myCountCellsDead)
 {
     Q_UNUSED(myCountCellsDead);
 
     // lblMyCount->setText(QString("Cells are: %1/20").arg(QString::number(myCountCells)));
-    lblMyCount->setText(QString(tr("My battle field: %1/0"))
+    lblMyCount->setText((QString::fromUtf8("Моих короблей живых/подбитых: %1/0"))
                         .arg(QString::number(myCountCells)));
 
     if (myCountCells == 20){
@@ -119,20 +125,20 @@ void Window::setMyCountOfCells(int myCountCells,int myCountCellsDead)
     }
 }
 
-void Window::setEnemyCountOfCells(int enemyCountCells, int enemyCountCellsDead)
+void Window_sea_fight::setEnemyCountOfCells(int enemyCountCells, int enemyCountCellsDead)
 {
     Q_UNUSED(enemyCountCells);
     Q_UNUSED(enemyCountCellsDead);
-    lblEnemyCount->setText(QString(tr("Enemy's battle field: 20/%1"))
+    lblEnemyCount->setText((QString::fromUtf8("Короблей противника живых/подбитых: 20/%1"))
                            .arg(QString::number(Enemy->getDeadShip())));
 
 }
-void Window::startServer(){
-    setWindowTitle(tr("You play like SERVER"));
+void Window_sea_fight::startServer(){
+    setWindowTitle(QString::fromUtf8("Вы играете на стророне сервера"));
     My->myShoot=false;// если первый вестрел за вами
     Enemy->myShoot=false;
-    qDebug() << QString("Start server");
-    serverWindow = new ServerWindow();
+    qDebug() << QString::fromUtf8("Сервер старт");
+
     serverWindow->setMyFild(My);
     serverWindow->setEnemyFild(Enemy);
     client->setEnabled(false);
@@ -145,12 +151,12 @@ void Window::startServer(){
     Enemy->setEnabled(true);
     serverWindow->show();
 }
-void Window::startClient(){
-    setWindowTitle(tr("You play like CLIENT"));
+void Window_sea_fight::startClient(){
+    setWindowTitle(QString::fromUtf8("Вы играете на стороне клиента (за Вами первый ход)"));
     My->myShoot=false;// если вы клиент то первый выстрел за сервером но первое тру для синхронизации
-   // Enemy->myShoot=false;
-    qDebug() << QString("Start client");
-    clientWindow = new ClientDialog();
+    // Enemy->myShoot=false;
+    qDebug() << QString::fromUtf8("Клиент старт");
+
     serverWindow = 0;
     clientWindow ->setMyFild(My);
     clientWindow ->setEnemyFild(Enemy);
@@ -165,7 +171,7 @@ void Window::startClient(){
     clientWindow->show();
 }
 
-void Window::startPlayWithComp(){
+void Window_sea_fight::startPlayWithComp(){
     My->myShoot=true;// если первый вестрел за вами
     Enemy->myShoot=false;
     server ->setEnabled(false);
@@ -180,48 +186,73 @@ void Window::startPlayWithComp(){
 
 
 }
-void Window::freeButtons(){
+void Window_sea_fight::freeButtons(){
     server ->setEnabled(true);
     client->setEnabled(true);
     playWithComp->setEnabled(true);
     randomPos->setEnabled(true);
 }
-Field* Window::getFieldClass(){
-    return NULL;
-}
 
-void Window::fireToEnemy(){
 
-    if(compPlayer !=0)
+void Window_sea_fight::fireToEnemy(){
+    int myShipDead = My->getDeadShip();
+    int enemyShipDead = Enemy->getDeadShip();
+
+
+    lblEnemyCount->setText((QString::fromUtf8("Короблей противника живых/подбитых: 20/%1"))
+                           .arg(QString::number(enemyShipDead)));
+    lblMyCount->setText((QString::fromUtf8("Моих короблей живых/подбитых: 20/%1"))
+                        .arg(QString::number(myShipDead)));
+
+    if(compPlayer !=0){
         compPlayer->fireComp();
+        Enemy->myShoot=true;
+
+        if(myShipDead == 20 || enemyShipDead == 20){
+            endWindow->setWinner((myShipDead < enemyShipDead));
+            endWindow->show();
+        }
+    }
+
 
     if(serverWindow !=0){
         My->myShoot = true;
         Enemy->myShoot=false;
         serverWindow->slotReadClient();
 
+        if(myShipDead == 20 || enemyShipDead == 20){
+            endWindow->setWinner((myShipDead < enemyShipDead));
+            endWindow->show();
+        }
     }
 
     if( clientWindow !=0){
         My->myShoot = true;
         Enemy->myShoot=false;
         clientWindow->onSokReadyRead();
-
-
+        if(myShipDead == 20 || enemyShipDead == 20){
+            endWindow->setWinner((myShipDead < enemyShipDead));
+            endWindow->show();
+        }
     }
 
     fire->setEnabled(false);
-
-
-
-
-    lblEnemyCount->setText(QString(tr("Enemy's battle field: 20/%1"))
-                           .arg(QString::number(Enemy->getDeadShip())));
-    lblMyCount->setText(QString(tr("My battle field: 20/%1"))
-                        .arg(QString::number(My->getDeadShip())));
 }
 
-void Window::fireBtnOffOnSet(){
+void Window_sea_fight::fireBtnOffOnSet(){
     fire->setEnabled(true);
 }
 
+Window_sea_fight::~Window_sea_fight(){
+    delete clientWindow;
+    delete serverWindow;
+    delete endWindow;
+
+
+}
+//debug
+//void Window_sea_fight::getMouseCoord(int x, int y)
+//{
+//    //    My->getFieldByXY(x,y);
+//    //    qDebug() << QString("X: %1; Y: %2").arg(QString::number(x)).arg(QString::number(y));
+//}

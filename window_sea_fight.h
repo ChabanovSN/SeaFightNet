@@ -15,19 +15,21 @@
 #include "serverwindow.h"
 #include "clientdialog.h"
 #include "compasplayer.h"
-
+#include "endwindow.h"
 #define SCREEN_WIDTH  1000
 #define SCREEN_HIEGHT 600
 
 
-class Window : public QWidget
+class Window_sea_fight : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Window(QWidget *parent = 0);
+    explicit Window_sea_fight(QWidget *parent = 0);
+    ~Window_sea_fight();
     MyField *My = 0;
     EnemyField *Enemy = 0;
     CompAsPlayer *compPlayer = 0;
+    EndWindow * endWindow = 0;
     // Не спрашивайте, почему я вместо лейблов поставил кнопки
     QPushButton *lblMyCount;     // эти надписи будут показывать
     QPushButton *lblEnemyCount;  // сколько клеток расставлено по полям
@@ -42,20 +44,20 @@ public:
     QPushButton *playWithComp;
     QPushButton *randomPos;
 
-signals:  
-    void sendName(const QString &name); // сигнал для отправки имени игрока
-    void startEditing();    // разрешить редактирование
-    void startGame();   // начать игру
+//signals:
+//    void sendName(const QString &name); // сигнал для отправки имени игрока
+//    void startEditing();    // разрешить редактирование
+
 
 private slots:
     void fireToEnemy();
-    void getMouseCoord(int x, int y);
+  //  void getMouseCoord(int x, int y);
     void setMyCountOfCells(int myCountCells,int myCountCellsDead);
     void setEnemyCountOfCells(int enemyCountCells,int enemyCountCellsDead);
     void startServer();
     void startClient();
     void startPlayWithComp();
-    Field *  getFieldClass();
+
      void fireBtnOffOnSet();
      void freeButtons();
 };

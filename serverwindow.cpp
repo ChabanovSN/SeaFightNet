@@ -76,7 +76,7 @@ void ServerWindow::slotReadClient()
     if(MyField->myShoot) //4 step  (shooting)
         {
 
-               MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
+               MyField->myShoot=false;//отключаем зацикливание
 
                    QString str ="";
                    str.clear();
@@ -93,7 +93,7 @@ void ServerWindow::slotReadClient()
 
 
     QString str = QString::fromUtf8(clientSocket->readAll());
-     qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
+    // qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
 
      QStringList pieces;
      if(str.length()>passwd.length()) // if word bigger then password
@@ -123,7 +123,7 @@ void ServerWindow::slotReadClient()
     if(!MyField->myShoot  && pieces.size()>3 && pieces[0]== passwd && pieces[2]== "c")//4 step  (shooting)
         {
                ui->textinfo->append("From Client (shoot):"+str+QTime::currentTime().toString()+"\n");
-               MyField->myShoot=false;//ждем нажатия кнопки Огонь противника
+               EnemyField->myShoot=true;//ждем нажатия кнопки Огонь противника drawCell();
 
                // получили первым массивом pieces[1] поле противника
              MyField->fillMyFieldFromConnect(pieces[3]);
