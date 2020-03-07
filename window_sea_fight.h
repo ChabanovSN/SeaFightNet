@@ -25,8 +25,8 @@ class Window : public QWidget
     Q_OBJECT
 public:
     explicit Window(QWidget *parent = 0);
-    MyField *My;
-    EnemyField *Enemy;
+    MyField *My = 0;
+    EnemyField *Enemy = 0;
     CompAsPlayer *compPlayer = 0;
     // Не спрашивайте, почему я вместо лейблов поставил кнопки
     QPushButton *lblMyCount;     // эти надписи будут показывать
@@ -35,8 +35,8 @@ public:
     QLabel *debEn;
     QPushButton *server;
     QPushButton *client;
-    ServerWindow *serverWindow;
-    ClientDialog *clientWindow;
+    ServerWindow *serverWindow = 0;
+    ClientDialog *clientWindow = 0;
     QPushButton *cleanField;
     QPushButton *fire;
     QPushButton *playWithComp;
@@ -46,9 +46,7 @@ signals:
     void sendName(const QString &name); // сигнал для отправки имени игрока
     void startEditing();    // разрешить редактирование
     void startGame();   // начать игру
-//    void btStartServer();
-//    void btStartClient();
-//public slots:
+
 private slots:
     void fireToEnemy();
     void getMouseCoord(int x, int y);
@@ -59,7 +57,7 @@ private slots:
     void startPlayWithComp();
     Field *  getFieldClass();
      void fireBtnOffOnSet();
-    void freeButtons();
+     void freeButtons();
 };
 
 #endif // WINDOW_H

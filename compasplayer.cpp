@@ -21,7 +21,7 @@ void CompAsPlayer::fireComp(){
     int j = 0;
 //qDebug()<<"EnemyField->myShoot"<<EnemyField->myShoot ;
 
-    while(EnemyField->myShoot){
+    while(EnemyField->myShoot && EnemyField->getDeadShip() !=20 && MyField->getDeadShip() !=20){
         i = rand()%10;
         j = rand()%10;
       //  qDebug()<<"comp player"<<MyField->FIELD[i][j] <<" i "<< i<<" j "<<j;
