@@ -131,7 +131,7 @@ void Window_sea_fight::setEnemyCountOfCells(int enemyCountCells, int enemyCountC
 }
 void Window_sea_fight::startServer(){
     serverWindowWored = true;
-    setWindowTitle(QString::fromUtf8("Вы играете на стророне сервера"));
+    setWindowTitle(QString::fromUtf8("Вы играете на стороне сервера"));
     My->myShoot=false;// если первый вестрел за вами
     Enemy->myShoot=false;
     qDebug() << QString::fromUtf8("Сервер старт");
