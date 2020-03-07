@@ -11,7 +11,7 @@ Window_sea_fight::Window_sea_fight(QWidget *parent) : QWidget(parent)
     this->setPalette(palette);
     endWindow = new EndWindow();
     serverWindow = new ServerWindow();
-     clientWindow = new ClientDialog();
+    clientWindow = new ClientDialog();
     My = new MyField(300,300);
     Enemy = new EnemyField(300, 300);
 
@@ -58,18 +58,14 @@ Window_sea_fight::Window_sea_fight(QWidget *parent) : QWidget(parent)
     this->resize(QSize(SCREEN_WIDTH, SCREEN_HIEGHT));
     this->setMinimumSize(QSize(SCREEN_WIDTH/2, SCREEN_HIEGHT/2));
 
-    //    // TODO: Сделать, чтобы в выводе писало с какого поля был клик
-    //    connect(My, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
-    //    connect(Enemy, SIGNAL(sendMouseCoord(int,int)), this, SLOT(getMouseCoord(int,int)));
+
 
     connect(My, SIGNAL(sendCountCells(int,int)), this, SLOT(setMyCountOfCells(int,int)));
     connect(Enemy, SIGNAL(sendCountCells(int,int)), this, SLOT(setEnemyCountOfCells(int,int)));
     connect(server,SIGNAL(clicked(bool)),this,SLOT(startServer()));
     connect(client,SIGNAL(clicked(bool)),this,SLOT(startClient()));
     connect(fire,SIGNAL(clicked(bool)),this,SLOT(fireToEnemy()));
-    // сигналы на сервер и клиент
-    //    connect(fire,SIGNAL(clicked(bool)),serverWindow,SLOT(slotReadClient()));
-    //    connect(fire,SIGNAL(clicked(bool)),clientWindow,SLOT(onSokReadyRead()));
+
 
     connect(Enemy,SIGNAL(fireBtnOnOff()),this,SLOT(fireBtnOffOnSet()));
     connect(playWithComp,SIGNAL(clicked(bool)),this,SLOT(startPlayWithComp()));
@@ -134,6 +130,7 @@ void Window_sea_fight::setEnemyCountOfCells(int enemyCountCells, int enemyCountC
 
 }
 void Window_sea_fight::startServer(){
+    serverWindowWored = true;
     setWindowTitle(QString::fromUtf8("Вы играете на стророне сервера"));
     My->myShoot=false;// если первый вестрел за вами
     Enemy->myShoot=false;
@@ -152,6 +149,7 @@ void Window_sea_fight::startServer(){
     serverWindow->show();
 }
 void Window_sea_fight::startClient(){
+    clientWindowWorked =true;
     setWindowTitle(QString::fromUtf8("Вы играете на стороне клиента (за Вами первый ход)"));
     My->myShoot=false;// если вы клиент то первый выстрел за сервером но первое тру для синхронизации
     // Enemy->myShoot=false;
@@ -191,6 +189,8 @@ void Window_sea_fight::freeButtons(){
     client->setEnabled(true);
     playWithComp->setEnabled(true);
     randomPos->setEnabled(true);
+    clientWindowWorked =false;
+    serverWindowWored = false;
 }
 
 
@@ -215,7 +215,7 @@ void Window_sea_fight::fireToEnemy(){
     }
 
 
-    if(serverWindow !=0){
+    if(serverWindowWored){
         My->myShoot = true;
         Enemy->myShoot=false;
         serverWindow->slotReadClient();
@@ -226,7 +226,7 @@ void Window_sea_fight::fireToEnemy(){
         }
     }
 
-    if( clientWindow !=0){
+    if(clientWindowWorked){
         My->myShoot = true;
         Enemy->myShoot=false;
         clientWindow->onSokReadyRead();

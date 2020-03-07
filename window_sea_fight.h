@@ -57,9 +57,11 @@ private slots:
     void startServer();
     void startClient();
     void startPlayWithComp();
-
      void fireBtnOffOnSet();
      void freeButtons();
+private:
+     bool serverWindowWored = false;
+     bool clientWindowWorked = false;
 };
 
 #endif // WINDOW_H
