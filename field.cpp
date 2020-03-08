@@ -59,13 +59,13 @@ void Field::mousePressEvent(QMouseEvent *event)
             drawCell(event->x(), event->y(), CL_CELL);
         }
         else
-            QMessageBox::information(this, "", "Field is closed");
+             QMessageBox::information(this, QString::fromUtf8("Внимание!"), QString::fromUtf8("Поле закрыто"));
     }
     else if (event->button() == Qt::RightButton){
-        if (editingMode == true)
+        if (editingMode == true){
             drawCell(event->x(), event->y(), CL_EMPTY);
-        else
-            QMessageBox::information(this, "", "Field is closed");
+        }else
+             QMessageBox::information(this, QString::fromUtf8("Внимание!"), QString::fromUtf8("Поле закрыто"));
     }
 
     emit sendMouseCoord(event->x(), event->y());
@@ -127,7 +127,8 @@ void Field::drawCell(int xP, int yP, CELLS cellType)
                 int i = c_x-1, j = c_y-1;
                 if(editingMode == true){
                     if (FIELD[i-1][j]==1 || FIELD[i+1][j]==1 || FIELD[i][j+1]==1 || FIELD[i][j-1]==1){
-                        QMessageBox::information(this, tr("Atantion!"),tr("You need more space!"));
+
+                        QMessageBox::information(this, QString::fromUtf8("Внимание"),QString::fromUtf8("Слишком близко!"));
                         return;
                     }
                 }
@@ -167,7 +168,7 @@ void Field::drawCell(int xP, int yP, CELLS cellType)
                     painter->setBrush(QBrush(QColor(176,224,230)));
                     painter->setPen(QPen( QColor(176,224,230)));
                     painter->drawRect(QRect(c_x*cell+1, c_y*cell+1, cell-2, cell-2));
-                    QMessageBox::information(this, tr("Atantion!"),tr("Only 1 shoot!"));
+                    QMessageBox::information(this, QString::fromUtf8("Внимание"),QString::fromUtf8("Только 1 выстрел!"));
                 }
             }
 
