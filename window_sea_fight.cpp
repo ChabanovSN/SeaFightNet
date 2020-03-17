@@ -100,7 +100,7 @@ void Window_sea_fight::setMyCountOfCells(int myCountCells,int myCountCellsDead)
     Q_UNUSED(myCountCellsDead);
 
     // lblMyCount->setText(QString("Cells are: %1/20").arg(QString::number(myCountCells)));
-    lblMyCount->setText((QString::fromUtf8("Моих короблей живых/подбитых: %1/0"))
+    lblMyCount->setText((QString::fromUtf8("Моих кораблей живых/подбитых: %1/0"))
                         .arg(QString::number(myCountCells)));
 
     if (myCountCells == 20){
@@ -125,7 +125,7 @@ void Window_sea_fight::setEnemyCountOfCells(int enemyCountCells, int enemyCountC
 {
     Q_UNUSED(enemyCountCells);
     Q_UNUSED(enemyCountCellsDead);
-    lblEnemyCount->setText((QString::fromUtf8("Короблей противника живых/подбитых: 20/%1"))
+    lblEnemyCount->setText((QString::fromUtf8("Кораблей противника живых/подбитых: 20/%1"))
                            .arg(QString::number(Enemy->getDeadShip())));
 
 }
