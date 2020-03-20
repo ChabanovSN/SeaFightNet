@@ -7,7 +7,10 @@
 #include <QObject>
 #include <QByteArray>
 #include <QDebug>
-
+#include<QSettings>
+#define SETTINGS_HOST "settings/host"
+#define SETTINGS_PORT "settings/port"
+#define SETTINGS_PASS "settings/pass"
 
 namespace Ui {
 class ServerWindow;
@@ -34,6 +37,7 @@ private:
     int server_status;
     QMap<int,QTcpSocket *> SClients;
     QString passwd;
+    QSettings settings;
 //    Field *MyField;
 //    Field *EnemyField;
 public slots:

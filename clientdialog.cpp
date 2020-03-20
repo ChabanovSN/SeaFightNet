@@ -10,6 +10,12 @@ ClientDialog::ClientDialog(QWidget *parent) :
     ui(new Ui::ClientDialog)
 {
     ui->setupUi(this);
+
+
+       ui->textHost->setText(settings.value(SETTINGS_HOST,  "127.0.0.1").toString());
+       ui->spinPort->setValue(settings.value(SETTINGS_PORT,  "3333").toInt());
+       ui->textpasswd->setText(settings.value(SETTINGS_PASS,  "user123").toString());
+
     passwd = ui->textpasswd->text();
 
     connect(ui->get, SIGNAL(clicked(bool)), this, SLOT(onSokReadyRead()));
@@ -66,7 +72,7 @@ void ClientDialog::onSokReadyRead(){
     }
 
     QString str = QString::fromUtf8(clientSocket.readAll());
-    qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
+    //qDebug()<<str.length()<<"str.length()!!!!!!!!!!!!!"<<str;
     QStringList pieces;
     if(str.length()>passwd.length()) // if word bigger then password
         pieces = str.split("/");
@@ -105,8 +111,14 @@ void ClientDialog::onSokReadyRead(){
 
 void ClientDialog::onSokConnected(){   
     clientSocket.connectToHost(QHostAddress(ui->textHost->text()), ui->spinPort->value());
-    if(clientSocket.isOpen())
+    if(clientSocket.isOpen()){
         AddToLog("Connect is open ",Qt::green);
+
+        settings.setValue(SETTINGS_HOST,ui->textHost->text());
+        settings.setValue(SETTINGS_PORT,ui->spinPort->value());
+        settings.setValue(SETTINGS_PASS,ui->textpasswd->text());
+        settings.sync();
+    }
     else
         AddToLog("Error to connect",Qt::green);
 }

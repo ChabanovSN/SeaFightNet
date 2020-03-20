@@ -3,7 +3,7 @@
 Window_sea_fight::Window_sea_fight(QWidget *parent) : QWidget(parent)
 {
 
-
+   setWindowTitle(QString::fromUtf8("Морской бой"));
     QPixmap bkgnd(":/sea_bg.jpg");
     bkgnd = bkgnd.scaled(SCREEN_WIDTH*2 ,SCREEN_HIEGHT*1.2);
     QPalette palette;
@@ -100,7 +100,7 @@ void Window_sea_fight::setMyCountOfCells(int myCountCells,int myCountCellsDead)
     Q_UNUSED(myCountCellsDead);
 
     // lblMyCount->setText(QString("Cells are: %1/20").arg(QString::number(myCountCells)));
-    lblMyCount->setText((QString::fromUtf8("Моих короблей живых/подбитых: %1/0"))
+    lblMyCount->setText((QString::fromUtf8("Моих кораблей живых/подбитых: %1/0"))
                         .arg(QString::number(myCountCells)));
 
     if (myCountCells == 20){
@@ -125,7 +125,7 @@ void Window_sea_fight::setEnemyCountOfCells(int enemyCountCells, int enemyCountC
 {
     Q_UNUSED(enemyCountCells);
     Q_UNUSED(enemyCountCellsDead);
-    lblEnemyCount->setText((QString::fromUtf8("Короблей противника живых/подбитых: 20/%1"))
+    lblEnemyCount->setText((QString::fromUtf8("Кораблей противника живых/подбитых: 20/%1"))
                            .arg(QString::number(Enemy->getDeadShip())));
 
 }
@@ -153,7 +153,7 @@ void Window_sea_fight::startClient(){
     setWindowTitle(QString::fromUtf8("Вы играете на стороне клиента (за Вами первый ход)"));
     My->myShoot=false;// если вы клиент то первый выстрел за сервером но первое тру для синхронизации
     // Enemy->myShoot=false;
-    qDebug() << QString::fromUtf8("Клиент старт");
+   // qDebug() << QString::fromUtf8("Клиент старт");
 
     serverWindow = 0;
     clientWindow ->setMyFild(My);
@@ -191,6 +191,9 @@ void Window_sea_fight::freeButtons(){
     randomPos->setEnabled(true);
     clientWindowWorked =false;
     serverWindowWored = false;
+    endWindow = new EndWindow();
+    serverWindow = new ServerWindow();
+    clientWindow = new ClientDialog();
 }
 
 
@@ -199,10 +202,7 @@ void Window_sea_fight::fireToEnemy(){
     int enemyShipDead = Enemy->getDeadShip();
 
 
-    lblEnemyCount->setText((QString::fromUtf8("Короблей противника живых/подбитых: 20/%1"))
-                           .arg(QString::number(enemyShipDead)));
-    lblMyCount->setText((QString::fromUtf8("Моих короблей живых/подбитых: 20/%1"))
-                        .arg(QString::number(myShipDead)));
+
 
     if(compPlayer !=0){
         compPlayer->fireComp();
@@ -237,6 +237,10 @@ void Window_sea_fight::fireToEnemy(){
     }
 
     fire->setEnabled(false);
+    lblEnemyCount->setText((QString::fromUtf8("Кораблей противника живых/подбитых: 20/%1"))
+                           .arg(QString::number(enemyShipDead)));
+    lblMyCount->setText((QString::fromUtf8("Моих кораблей живых/подбитых: 20/%1"))
+                        .arg(QString::number(myShipDead)));
 }
 
 void Window_sea_fight::fireBtnOffOnSet(){

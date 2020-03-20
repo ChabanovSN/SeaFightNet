@@ -6,6 +6,14 @@ ServerWindow::ServerWindow(QWidget *parent) :
     ui(new Ui::ServerWindow)
 {
     ui->setupUi(this);
+
+    ui->textip->setPlainText(settings.value(SETTINGS_HOST,  "127.0.0.0").toString());
+    ui->textport->setPlainText(settings.value(SETTINGS_PORT,  "3333").toString());
+    ui->textpasswd->setPlainText(settings.value(SETTINGS_PASS,  "user123").toString());
+
+
+
+
 }
 
 ServerWindow::~ServerWindow()
@@ -20,16 +28,19 @@ void ServerWindow::on_starting_clicked()
     tcpServer = new QTcpServer(this);
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newuser()));
     if (!tcpServer->listen(QHostAddress(ui->textip->toPlainText()), ui->textport->toPlainText().toInt()) && server_status==0) {
-        qDebug() <<  QObject::tr("Unable to start the server: %1.").arg(tcpServer->errorString());
+       // qDebug() <<  QObject::tr("Unable to start the server: %1.").arg(tcpServer->errorString());
         ui->textinfo->append(tcpServer->errorString());
     } else {
         server_status=1;
-        qDebug() << tcpServer->isListening() << "TCPSocket listen on port";
-        qDebug() <<tcpServer->serverAddress() <<QString::fromUtf8("Адресс сервера!\n");
-        qDebug() <<tcpServer->serverPort() <<QString::fromUtf8("Port сервера!\n");
+//        qDebug() << tcpServer->isListening() << "TCPSocket listen on port";
+//        qDebug() <<tcpServer->serverAddress() <<QString::fromUtf8("Адресс сервера!\n");
+//        qDebug() <<tcpServer->serverPort() <<QString::fromUtf8("Port сервера!\n");
         ui->textinfo->append(QString::fromUtf8("Сервер запущен!"));
-
-        qDebug() << QString::fromUtf8("Сервер запущен!");
+        settings.setValue(SETTINGS_HOST,ui->textip->toPlainText());
+        settings.setValue(SETTINGS_PORT,ui->textport->toPlainText());
+        settings.setValue(SETTINGS_PASS,ui->textpasswd->toPlainText());
+        settings.sync();
+       // qDebug() << QString::fromUtf8("Сервер запущен!");
     }
 }
 
@@ -45,7 +56,7 @@ void ServerWindow::on_stoping_clicked()
         }
         tcpServer->close();
         ui->textinfo->append(QString::fromUtf8("Сервер остановлен!"));
-        qDebug() << QString::fromUtf8("Сервер остановлен!");
+      //  qDebug() << QString::fromUtf8("Сервер остановлен!");
         server_status=0;
     }
 }
@@ -54,7 +65,7 @@ void ServerWindow::on_stoping_clicked()
 void ServerWindow::newuser()
 {
     if(server_status==1){
-        qDebug() << QString::fromUtf8("У нас новое соединение!");
+       // qDebug() << QString::fromUtf8("У нас новое соединение!");
         ui->textinfo->append(QString::fromUtf8("У нас новое соединение!"));
         clientSocket=tcpServer->nextPendingConnection();
 

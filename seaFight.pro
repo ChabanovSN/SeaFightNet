@@ -37,7 +37,7 @@ FORMS    += \
     clientdialog.ui \
     endwindow.ui
 
-DISTFILES +=
+
 
 RESOURCES += \
     res.qrc
